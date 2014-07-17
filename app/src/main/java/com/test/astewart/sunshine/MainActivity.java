@@ -10,6 +10,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +74,22 @@ public class MainActivity extends Activity {
             };
             List<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
 
+            // Now that we have some dummy forecast data, create an ArrayAdapter.
+            // The ArrayAdapter will take data from a source (like our dummy forecast) and
+            // use it to populate the ListView it's attached to.
+            ArrayAdapter<String> forecastAdapter =
+                    new ArrayAdapter<String>(
+                            getActivity(), // The current context (this activity)
+                            R.layout.list_item_forecast, // The name of the layout ID.
+                            R.id.list_item_forecast_textview, // The ID of the textview to populate.
+                            weekForecast);
+
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+            // Get a reference to the ListView, and attach this adapter to it.
+            ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+            listView.setAdapter(forecastAdapter);
+
             return rootView;
         }
     }
