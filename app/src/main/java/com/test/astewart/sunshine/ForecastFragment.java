@@ -35,6 +35,8 @@ import java.util.List;
  */
 public class ForecastFragment extends Fragment {
 
+    private ArrayAdapter<String> mForecastAdapter;
+
     public ForecastFragment() {
     }
 
@@ -83,7 +85,7 @@ public class ForecastFragment extends Fragment {
         // Now that we have some dummy forecast data, create an ArrayAdapter.
         // The ArrayAdapter will take data from a source (like our dummy forecast) and
         // use it to populate the ListView it's attached to.
-        ArrayAdapter<String> forecastAdapter =
+        mForecastAdapter =
                 new ArrayAdapter<String>(
                         getActivity(), // The current context (this activity)
                         R.layout.list_item_forecast, // The name of the layout ID.
@@ -94,7 +96,7 @@ public class ForecastFragment extends Fragment {
 
         // Get a reference to the ListView, and attach this adapter to it.
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
-        listView.setAdapter(forecastAdapter);
+        listView.setAdapter(mForecastAdapter);
 
         return rootView;
     }
@@ -178,15 +180,15 @@ public class ForecastFragment extends Fragment {
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
             }
 
-            for (String s : resultStrs) {
-                Log.v(LOG_TAG, "Forecast entry: " + s);
-            }
+            //for (String s : resultStrs) {
+            //    Log.v(LOG_TAG, "Forecast entry: " + s);
+            //}
             return resultStrs;
 
         }
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected String[] doInBackground(String... params)  {
 
             // If there's no zip code, there's nothing to look up.  Verify size of params.
             if (params.length == 0) {
@@ -224,7 +226,8 @@ public class ForecastFragment extends Fragment {
 
                 URL url = new URL(builtUri.toString());
 
-                Log.v(LOG_TAG, "Built URI " + builtUri.toString());
+                //Output JSON. Debugging Purposes ONLY:
+                //Log.v(LOG_TAG, "Built URI " + builtUri.toString());
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -255,7 +258,7 @@ public class ForecastFragment extends Fragment {
                 forecastJsonStr = buffer.toString();
 
                 //Output JSON. Debugging Purposes ONLY:
-                Log.v(LOG_TAG, "Forecast JSON String: " + forecastJsonStr);
+                //Log.v(LOG_TAG, "Forecast JSON String: " + forecastJsonStr);
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
@@ -284,6 +287,17 @@ public class ForecastFragment extends Fragment {
 
             // This will only happen if there was an error getting or parsing the forecast.
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] result) {
+            if (result != null) {
+                mForecastAdapter.clear();
+                for(String dayForecastStr : result) {
+                    mForecastAdapter.add(dayForecastStr);
+                }
+                // New data is back from the server.  Hooray!
+            }
         }
     }
 }
